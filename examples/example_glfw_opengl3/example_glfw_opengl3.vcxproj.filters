@@ -10,9 +10,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>sources</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\imgui.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
@@ -32,6 +29,18 @@
       <Filter>sources</Filter>
     </ClCompile>
     <ClCompile Include="..\..\backends\imgui_impl_opengl3.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\imgui_tex_inspect\glad\src\glad.c">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="viewer2.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\inspect\imgui_tex_inspect.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\inspect\tex_inspect_opengl.cpp">
       <Filter>sources</Filter>
     </ClCompile>
   </ItemGroup>

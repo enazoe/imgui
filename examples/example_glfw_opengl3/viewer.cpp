@@ -9,6 +9,8 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 #include <stdio.h>
+#include "imgui_tex_inspect.h"
+#include "tex_inspect_opengl.h"
 namespace fs = std::experimental::filesystem;
 
 // Variables
@@ -51,7 +53,7 @@ bool LoadImage(const std::string& filePath)
 // Function to display the image using ImGui
 void DisplayImage()
 {
-    ImGui::Begin("Image Viewer",nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove);
+    ImGui::Begin("Image Viewer", nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove);
     if (imageTexture != 0)
     {
         ImVec2 imageSize(static_cast<float>(imageWidth) * zoomLevel, static_cast<float>(imageHeight) * zoomLevel);
@@ -60,8 +62,8 @@ void DisplayImage()
 
         ImGui::Image(reinterpret_cast<void*>(static_cast<intptr_t>(imageTexture)),
             imageSize,
-            ImVec2(0,0),
-            ImVec2(1,1));
+            ImVec2(0, 0),
+            ImVec2(1, 1));
 
         // Check if the mouse is over the image
         if (ImGui::IsItemHovered())
@@ -73,7 +75,7 @@ void DisplayImage()
             }
             else if (ImGui::IsMouseDown(0) && !isMouseDragging)
             {
-                std::cout<< "drag" << std::endl;
+                std::cout << "drag" << std::endl;
                 isMouseDragging = true;
                 prevMouseX = ImGui::GetIO().MousePos.x;
                 prevMouseY = ImGui::GetIO().MousePos.y;
@@ -115,8 +117,8 @@ void DisplayImage()
 
         // Apply the dragging offset to the image position
         ImGui::SetCursorPos(ImVec2(imagePos.x + offsetX, imagePos.y + offsetY));
-     //   std::cout << imagePos.x + offsetX<<","<<imagePos.y + offsetY << std::endl;
-        //Gui::SetCursorScreenPos(ImVec2(imagePos.x + offsetX, imagePos.y + offsetY));
+        //   std::cout << imagePos.x + offsetX<<","<<imagePos.y + offsetY << std::endl;
+           //Gui::SetCursorScreenPos(ImVec2(imagePos.x + offsetX, imagePos.y + offsetY));
     }
     else
     {
@@ -232,19 +234,12 @@ int main()
     if (!Initialize())
         return 1;
 
-    // Search for image files in the current directory
-    const std::string currentPath = fs::current_path().string();
-    std::cout << currentPath << std::endl;
-    for (const auto& entry : fs::directory_iterator(currentPath))
-    {
-        const std::string filePath = entry.path().string();
-        if (fs::is_regular_file(entry) && stbi_is_hdr(filePath.c_str()) )
-        {
-            imageFiles.push_back(filePath);
-        }
-    }
-    imageFiles.clear();
-    imageFiles = { "D:/study/imgui/examples/example_glfw_opengl3/Release/demo_1.png" };
+   // ImGuiTexInspect::ImplOpenGL3_Init(); // Or DirectX 11 equivalent (check your chosen backend header file)
+    ImGuiTexInspect::Init();
+    ImGuiTexInspect::CreateContext();
+
+    LoadImage("D:/study/imgui/examples/example_glfw_opengl3/Release/demo_1.png");
+
     while (!glfwWindowShouldClose(window))
     {
         glfwPollEvents();
@@ -256,7 +251,26 @@ int main()
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        DisplayImage();
+        ImGui::Begin("Simple Texture Inspector");
+    /*    ImGuiTexInspect::BeginInspectorPanel("Inspector",reinterpret_cast<void*>(static_cast<intptr_t>(imageTexture)),ImVec2(imageWidth, imageHeight),(ImGuiTexInspect::InspectorFlags)0);
+        ImGuiTexInspect::EndInspectorPanel();
+        ImGui::End();*/
+
+
+
+        static bool flipX = false;
+        static bool flipY = false;
+
+        ImGuiTexInspect::InspectorFlags flags = 0;
+      //  if (flipX) SetFlag(flags, ImGuiTexInspect::InspectorFlags_FlipX);
+      //  if (flipY) SetFlag(flags, ImGuiTexInspect::InspectorFlags_FlipY);
+
+        if (ImGuiTexInspect::BeginInspectorPanel("##ColorFilters", reinterpret_cast<void*>(static_cast<intptr_t>(imageTexture)), ImVec2(imageWidth, imageHeight), flags))
+        {
+            // Draw some text showing color value of each texel (you must be zoomed in to see this)
+            ImGuiTexInspect::DrawAnnotations(ImGuiTexInspect::ValueText(ImGuiTexInspect::ValueText::BytesDec));
+        }
+        ImGuiTexInspect::EndInspectorPanel();
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
